@@ -16,6 +16,7 @@ gem 'sdoc', '~> 0.4.0', group: :doc
 gem 'elasticsearch-model'
 gem 'elasticsearch-rails'
 gem 'carrierwave'
+gem 'tire'
 
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'

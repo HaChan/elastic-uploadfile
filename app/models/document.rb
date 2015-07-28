@@ -1,16 +1,14 @@
 class Document < ActiveRecord::Base
-  include Elasticsearch::Model
-  include Elasticsearch::Model::Callbacks
+  include Tire::Model::Search
+  include Tire::Model::Callbacks
+
+  mapping _source: { excludes: ['attachment'] } do
+    indexes :id, type: 'integer'
+    indexes :title
+    indexes :attachment, type: 'attachment'
+  end
 
   mount_uploader :document_attachment, DocumentAttachmentUploader
-
-  settings index: { number_of_shards: 1, number_of_replicas: 0 } do
-    mapping _source: {excludes: ['attachment']} do
-      indexes :id, type: 'integer'
-      indexes :title, type: 'string'
-      indexes :attachment, type: 'attachment', analyzer: 'english', index_options: 'offsets'
-    end
-  end
 
   def attachment
     return if document_attachment.nil? || document_attachment.file.nil?
@@ -18,7 +16,7 @@ class Document < ActiveRecord::Base
     Base64.encode64(open(path_to_attachment){ |file| file.read })
   end
 
-  def as_indexed_json(options={})
-    as_json only: [:title, :attachment], methods: [:attachment]
+  def to_indexed_json
+    to_json(methods: [:attachment])
   end
 end
